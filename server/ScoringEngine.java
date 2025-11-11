@@ -9,15 +9,29 @@ public class ScoringEngine {
         this.scores = scores;
     }
 
-    public void submitAnswer(String qid, String nickname, int answerOption) {
+    /**
+     * Submit an answer for a question.
+     *
+     * @param qid           Question ID
+     * @param nickname      Player nickname
+     * @param answerOption  Player's chosen option index
+     * @param correctOption Correct option index for the question
+     */
+    public void submitAnswer(String qid, String nickname, int answerOption, int correctOption) {
         answered.putIfAbsent(qid, ConcurrentHashMap.newKeySet());
         Set<String> s = answered.get(qid);
+
         synchronized (s) {
-            if (s.contains(nickname)) return;
+            // Prevent multiple submissions for the same question
+            if (s.contains(nickname))
+                return;
             s.add(nickname);
         }
-        // Award 1 point immediately (simple scoring)
-        scores.put(nickname, scores.getOrDefault(nickname, 0) + 1);
+
+        // Only award points if the answer is correct
+        if (answerOption == correctOption) {
+            scores.put(nickname, scores.getOrDefault(nickname, 0) + 1);
+        }
     }
 
     public Map<String, Integer> getScoresSnapshot() {
