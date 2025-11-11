@@ -1,307 +1,554 @@
-# QuizNet - Real-Time Multiplayer Quiz System
+# QuizNet — Real-Time Multiplayer Quiz System
 
-## Overview
-QuizNet is an advanced real-time multiplayer quiz application featuring both a modern web interface and traditional Java client. It demonstrates advanced Java network programming concepts including:
-- Java NIO (Selector/Channels)
-- WebSocket protocol implementation
-- TCP sockets
-- Multi-threading and concurrent programming
-- Real-time communication
+![Java](https://img.shields.io/badge/Java-11+-orange.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## ✨ Features
+## 📋 Overview
 
-### Core Features
-- 🎮 **Real-time multiplayer gameplay** - Multiple players can join and compete simultaneously
-- 🌐 **Web-based GUI** - Modern, responsive HTML/CSS/JavaScript interface
-- 🔌 **Dual Protocol Support** - WebSocket for web clients, traditional sockets for Java clients
-- 📊 **Live Leaderboard** - Real-time score tracking and rankings
-- 💬 **In-game Chat** - Communicate with other players
-- ⏱️ **Timed Questions** - Configurable time limits per question
-- 🎯 **Multiple Categories** - Questions organized by topic (Science, History, Geography, etc.)
-- 📈 **Difficulty Levels** - Easy, Medium, and Hard questions
-- 🏆 **Game Statistics** - Track correct answers, streaks, and accuracy
+QuizNet is a real-time multiplayer quiz platform demonstrating advanced Java network programming concepts. It features:
+- ⚡ **Java NIO** server using Selector/Channels for efficient concurrent connections
+- 🌐 **Dual Protocol Support** - WebSocket for web clients, TCP for Java console clients
+- 🎮 **Real-time gameplay** with live leaderboard and chat
+- 🎯 **Customizable quizzes** - question count, categories, and time limits
+- 📱 **Modern responsive web UI** built with vanilla JavaScript
 
-### Advanced Features
-- Real-time timer synchronization
-- Animated score updates
-- Answer feedback with visual effects
-- Responsive design for all screen sizes
-- Session management
-- Automatic game state management
+---
 
-## 📁 Structure
+## 🏗️ Architecture
+
 ```
-QuizNet/
-├── README.md
-├── questions.txt                    # Question database with categories
-├── server/
-│   ├── QuizServer.java             # Original NIO server
-│   ├── EnhancedQuizServer.java     # WebSocket-enabled server
-│   ├── QuestionManager.java        # Basic question handler
-│   ├── EnhancedQuestionManager.java # Advanced question handler
-│   └── ScoringEngine.java          # Score calculation
-├── client/
-│   ├── QuizClient.java             # Console client
-│   └── ClientListener.java         # Client message handler
-└── web/
-    ├── index.html                  # Web client interface
-    ├── css/
-    │   └── styles.css              # Modern styling
-    └── js/
-        └── app.js                  # Client-side logic
+┌─────────────┐         WebSocket          ┌──────────────────┐
+│ Web Browser │◄────────────────────────────┤                  │
+│  (HTML/JS)  │                             │   Java NIO       │
+└─────────────┘                             │   Quiz Server    │
+                                            │   (Selector)     │
+┌─────────────┐         TCP Socket          │                  │
+│ Java Console│◄────────────────────────────┤   Port 9000      │
+│   Client    │                             │                  │
+└─────────────┘                             └──────────────────┘
+                                                     ▲
+                                                     │
+                                            ┌────────┴─────────┐
+                                            │  questions.txt   │
+                                            │  (Question DB)   │
+                                            └──────────────────┘
 ```
 
-## 🚀 Quick Start
+### Key Components
 
-### Prerequisites
-- JDK 11 or higher
-- Modern web browser (Chrome, Firefox, Edge, Safari)
-- `javac` and `java` in your PATH
+- **`server/`** — NIO-based server with WebSocket handshake implementation
+  - `EnhancedQuizServer.java` — Main server, connection handling, message routing
+  - `EnhancedQuestionManager.java` — Question selection, filtering, and scheduling
+  - `ScoringEngine.java` — Score calculation and leaderboard management
 
-### Option 1: Web Client (Recommended)
+- **`web/`** — Single-page web application
+  - `index.html` — Responsive UI with lobby, game, and results screens
+  - `css/style.css` — Modern styling with animations
+  - `js/app.js` — WebSocket client, game logic, DOM updates
 
-1. **Compile the enhanced server:**
-   ```powershell
-   javac -d out/server server/*.java
-   ```
+- **`client/`** — Optional Java console client
+  - `QuizClient.java` — TCP client with command-line interface
+  - `ClientListener.java` — Message handler for server responses
 
-2. **Start the enhanced server:**
-   ```powershell
-   java -cp out/server EnhancedQuizServer
-   ```
+- **`questions.txt`** — Question database (format: `question|opt1|opt2|opt3|opt4|correct|category|difficulty`)
 
-3. **Open the web client:**
-   - Simply open `web/index.html` in your browser
-   - Or serve it with a local web server:
-     ```powershell
-     # Using Python 3
-     cd web
-     python -m http.server 8080
-     ```
-   - Navigate to `http://localhost:8080`
+---
 
-4. **Play the game:**
-   - Enter your nickname
-   - Server address: `localhost:9000`
-   - Click "Join Game"
-   - Wait for other players or click "Start Quiz"
+## 🎯 Features
 
-### Option 2: Console Client (Original)
+### Player Features
+- ✅ Join multiplayer quiz sessions
+- ✅ Customize quiz settings (question count, category, time per question)
+- ✅ Real-time question delivery with countdown timers
+- ✅ Live leaderboard updates
+- ✅ Chat with other players
+- ✅ View final results and rankings
 
-1. **Compile server:**
-   ```powershell
-   javac -d out/server server/*.java
-   ```
+### Technical Features
+- ✅ Non-blocking I/O with Java NIO Selector
+- ✅ Custom WebSocket implementation (RFC 6455)
+- ✅ Concurrent client handling with thread-safe collections
+- ✅ Scheduled question timers using ScheduledExecutorService
+- ✅ Category and difficulty-based question filtering
+- ✅ Dynamic quiz generation
 
-2. **Run server:**
-   ```powershell
-   java -cp out/server QuizServer
-   ```
+---
 
-3. **Compile client:**
-   ```powershell
-   javac -d out/client client/*.java
-   ```
+## 🔌 Protocol Specification
 
-4. **Run client(s):**
-   ```powershell
-   java -cp out/client QuizClient
-   ```
+QuizNet uses a simple pipe-delimited text protocol:
+
+### Client → Server Messages
+
+| Command | Format | Example | Description |
+|---------|--------|---------|-------------|
+| JOIN | `JOIN\|nickname` | `JOIN\|Alice` | Join the quiz session |
+| START | `START\|count\|category\|time` | `START\|5\|geography\|10` | Start quiz with settings |
+| ANSWER | `ANSWER\|questionId\|optionIndex` | `ANSWER\|Q0\|2` | Submit answer (0-3) |
+| CHAT | `CHAT\|message` | `CHAT\|Good luck!` | Send chat message |
+| QUIT | `QUIT` | `QUIT` | Leave the session |
+
+### Server → Client Messages
+
+| Message | Format | Example | Description |
+|---------|--------|---------|-------------|
+| WELCOME | `WELCOME\|sessionId\|playerCount` | `WELCOME\|ABC123\|3` | Connection confirmed |
+| INFO | `INFO\|message` | `INFO\|Quiz starting...` | System notification |
+| QUESTION | `QUESTION\|id\|text\|opt1\|opt2\|opt3\|opt4\|time` | `QUESTION\|Q0\|Capital?\|Paris\|London\|Berlin\|Rome\|10` | Quiz question |
+| RESULT | `RESULT\|questionId\|correctIndex` | `RESULT\|Q0\|2` | Correct answer reveal |
+| LEADERBOARD | `LEADERBOARD\|name,score;...` | `LEADERBOARD\|Alice,100;Bob,80` | Current rankings |
+| END | `END\|message` | `END\|Quiz complete!` | Quiz finished |
+
+---
+
+# QuizNet - Quick Start Guide
+
+## 🚀 Getting Started in 3 Steps!
+
+### Step 1: Compile the Server
+Open PowerShell in the QuizNet directory and run:
+```powershell
+javac -d out/server server/EnhancedQuizServer.java server/EnhancedQuestionManager.java server/ScoringEngine.java
+```
+
+### Step 2: Start the Server
+```powershell
+java -cp out/server EnhancedQuizServer
+```
+
+You should see:
+```
+Loaded questions:
+  literature: 2 questions
+  general: 3 questions
+  sports: 3 questions
+  ...
+Enhanced QuizServer started on port 9000
+Supports both traditional sockets and WebSocket connections
+```
+
+### Step 3: Open the Web Client
+Simply double-click `web/index.html` or open it in your browser!
+
+---
+
 
 ## 🎮 How to Play
 
-### Web Client Instructions
+### Web Client
 
-1. **Login Screen**
-   - Enter a unique nickname
-   - Specify server address (default: localhost:9000)
-   - Click "Join Game"
+1. **Join the Lobby**
+   - Open `web/index.html` in your browser
+   - Enter your nickname and click "Join Quiz"
 
-2. **Lobby**
-   - See all connected players
+2. **Configure Quiz Settings**
+   - Select number of questions (1-20)
+   - Choose a category (All, Science, History, Geography, etc.)
+   - Set time per question (5-60 seconds)
+
+3. **Start the Quiz**
+   - Click "Start Quiz" to begin
+   - Questions will appear with a countdown timer
+
+4. **Answer Questions**
+   - Click your answer before time runs out
+   - See if you were correct after each question
+   - Watch the leaderboard update in real-time
+
+5. **View Results**
+   - See final rankings when the quiz ends
    - Chat with other players
-   - Configure game settings (difficulty, time per question)
-   - Anyone can start the quiz by clicking "Start Quiz"
 
-3. **During the Quiz**
-   - Read the question carefully
-   - Click on your answer before time runs out
-   - See live rankings on the sidebar
-   - Track your statistics (correct, wrong, streak)
+### Console Client
 
-4. **Results**
-   - View your final score and accuracy
-   - See the complete leaderboard
-   - Play again or return to lobby
-
-### Console Client Commands
-- **Join:** Automatic on start (enter nickname)
-- **Answer:** Type when question appears
-- **Chat:** `chat your message`
-- **Start:** Type `start` to begin quiz
-- **Quit:** Type `quit` to exit
-
-## 🔧 Configuration
-
-### Server Configuration
-Edit the server startup to customize:
-```java
-// In EnhancedQuizServer.java main method
-int port = 9000;                    // Server port
-String questionsFile = "questions.txt";  // Question database
 ```
-
-### Question Database Format
-Add questions to `questions.txt`:
-```
-Question text?|Option1|Option2|Option3|Option4|CorrectIndex|Category|Difficulty
+Commands:
+  start [questions] [category] [time]  - Start quiz with settings
+  answer [0-3]                         - Submit answer
+  chat [message]                       - Send chat message
+  quit                                 - Exit quiz
 ```
 
 Example:
 ```
-What is 2+2?|3|4|5|6|2|mathematics|easy
+> start 5 geography 10
+> answer 2
+> chat Good game everyone!
 ```
-
-Categories: `general`, `science`, `history`, `geography`, `technology`, `sports`, `mathematics`, `literature`
-
-Difficulty: `easy`, `medium`, `hard`
-
-### Game Settings (Web Client)
-- **Difficulty**: Easy, Medium, or Hard
-- **Time per Question**: 10, 15, 20, or 30 seconds
-
-## 🏗️ Architecture
-
-### Server Architecture
-- **NIO Selector Pattern**: Efficient handling of multiple concurrent connections
-- **WebSocket Implementation**: Full handshake and frame parsing
-- **Dual Protocol Support**: Seamlessly handles both WebSocket and traditional socket clients
-- **Thread Pool**: Scheduled executors for timer management
-- **Concurrent Collections**: Thread-safe client and score management
-
-### Client Architecture (Web)
-- **Single Page Application**: Dynamic screen management
-- **WebSocket Client**: Real-time bidirectional communication
-- **Event-Driven**: Responsive UI updates
-- **State Management**: Track game progress and player statistics
-
-### Communication Protocol
-```
-Client -> Server:
-  JOIN|nickname
-  ANSWER|questionId|optionIndex
-  CHAT|message
-  START
-  QUIT
-
-Server -> Client:
-  WELCOME|session|playerCount
-  INFO|message
-  CHAT|sender|message
-  QUESTION|id|text|opt1|opt2|opt3|opt4|timeLimit
-  RESULT|questionId|correctOption
-  LEADERBOARD|name1,score1;name2,score2;...
-  END|message
-```
-
-## 🎨 Web Interface Features
-
-### Responsive Design
-- Desktop-optimized layout
-- Tablet-friendly interface
-- Mobile-responsive (single column on small screens)
-
-### Visual Effects
-- Smooth animations and transitions
-- Color-coded answer feedback
-- Progress bars and timers
-- Gradient backgrounds
-- Hover effects and micro-interactions
-
-### Accessibility
-- High contrast colors
-- Clear typography
-- Keyboard navigation support
-- Screen reader friendly
-
-## 🛠️ Development
-
-### Building from Source
-```powershell
-# Clean previous builds
-Remove-Item -Recurse -Force out -ErrorAction SilentlyContinue
-
-# Compile all server files
-javac -d out/server server/*.java
-
-# Compile all client files
-javac -d out/client client/*.java
-```
-
-### Running Tests
-```powershell
-# Start server
-java -cp out/server EnhancedQuizServer
-
-# In separate terminals, start multiple clients
-java -cp out/client QuizClient
-```
-
-### Adding New Features
-1. **New Question Categories**: Add to `questions.txt` with category tag
-2. **Custom Scoring**: Modify `ScoringEngine.java`
-3. **UI Themes**: Edit `web/css/styles.css` CSS variables
-4. **Client Features**: Extend `web/js/app.js`
-
-## 📊 Technical Specifications
-
-### Server
-- **Language**: Java 11+
-- **Concurrency**: NIO Selector, ScheduledExecutorService
-- **Data Structures**: ConcurrentHashMap, CopyOnWriteArrayList
-- **Protocols**: TCP, WebSocket (RFC 6455)
-
-### Web Client
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Communication**: WebSocket API
-- **Styling**: Modern CSS with CSS Grid and Flexbox
-- **Fonts**: Google Fonts (Poppins)
-
-## 🔐 Security Considerations
-- Input validation on all client messages
-- WebSocket handshake verification
-- Nickname sanitization
-- Message length limits
-- Connection timeout handling
-
-## 🚀 Future Enhancements
-- [ ] User authentication and profiles
-- [ ] Persistent score database
-- [ ] Multiple game rooms
-- [ ] Power-ups and bonuses
-- [ ] Question editor interface
-- [ ] Mobile app (React Native)
-- [ ] Voice chat integration
-- [ ] Tournament mode
-- [ ] AI opponents
-
-## 📝 License
-This project is for educational purposes demonstrating network programming concepts.
-
-## 👥 Contributing
-Feel free to fork, modify, and submit pull requests!
-
-## 📧 Support
-For issues or questions, please create an issue in the repository.
 
 ---
 
-**Built with using Java NIO and WebSockets**
-- To answer type: `answer Q0 2` (example) to send answer for question Q0 option 2.
-- To chat: `chat Hello everyone`
-- To quit: type `quit`
+## 🎓 Presentation Guide
 
-## Notes
-- This project intentionally uses a single quiz room (all connected clients participate).
-- Scores reset each server run.
-- Questions are loaded from `questions.txt` in the root project directory.
+### Slide Deck Outline
+
+#### Slide 1: Title & Overview
+- **Title:** QuizNet - Real-Time Multiplayer Quiz System
+- **Subtitle:** Advanced Java Network Programming with WebSocket & NIO
+- **Bullet points:**
+  - Real-time multiplayer quiz platform
+  - Java NIO + WebSocket implementation
+  - Modern web client with responsive UI
+
+#### Slide 2: System Architecture
+- Show the architecture diagram (above)
+- Explain dual protocol support (WebSocket + TCP)
+- Highlight Java NIO Selector for efficient concurrency
+
+#### Slide 3: Key Technologies
+- **Java NIO (Non-blocking I/O)**
+  - Single-threaded server handles multiple connections
+  - `Selector` multiplexes I/O operations
+  - Efficient resource usage
+- **WebSocket Protocol (RFC 6455)**
+  - Custom handshake implementation
+  - Binary frame encoding/decoding
+  - Full-duplex communication
+- **Concurrent Programming**
+  - `ConcurrentHashMap` for thread-safe state
+  - `ScheduledExecutorService` for timers
+
+#### Slide 4: Protocol Design
+- Show the protocol table (from above)
+- Explain pipe-delimited message format
+- Demonstrate message flow diagram:
+  ```
+  Client                Server
+    |------- JOIN -------->|
+    |<----- WELCOME -------|
+    |------ START -------->|
+    |<---- QUESTION -------|
+    |------ ANSWER ------->|
+    |<----- RESULT --------|
+    |<--- LEADERBOARD -----|
+  ```
+
+#### Slide 5: Features & Capabilities
+- Real-time gameplay
+- Customizable quiz settings
+- Live leaderboard
+- Chat functionality
+- Category and difficulty filtering
+
+#### Slide 6: Live Demo
+- **Pre-demo checklist:**
+  - [ ] Server compiled and ready
+  - [ ] Browser windows open
+  - [ ] Server terminal visible
+  - [ ] Network connectivity confirmed
+- **Demo steps:**
+  1. Start server (show console output)
+  2. Join with Player 1 (show WebSocket handshake in logs)
+  3. Join with Player 2 (show player count update)
+  4. Configure quiz (5 questions, Geography, 10s)
+  5. Start quiz (show question broadcast in logs)
+  6. Answer questions (show score updates)
+  7. View final results
+
+#### Slide 7: Code Walkthrough
+Show key code snippets:
+
+**Server Message Handling:**
+```java
+// EnhancedQuizServer.java
+private void handleClientMessage(SocketChannel channel, String message) {
+    String[] parts = message.split("\\|");
+    String command = parts[0];
+    
+    switch (command) {
+        case "JOIN":
+            handleJoin(channel, parts[1]);
+            break;
+        case "START":
+            int count = Integer.parseInt(parts[1]);
+            String category = parts[2];
+            int time = Integer.parseInt(parts[3]);
+            startQuiz(count, category, time);
+            break;
+        // ...
+    }
+}
+```
+
+**WebSocket Handshake:**
+```java
+private void performWebSocketHandshake(SocketChannel channel, String request) {
+    String key = extractWebSocketKey(request);
+    String acceptKey = generateWebSocketAccept(key);
+    
+    String response = "HTTP/1.1 101 Switching Protocols\r\n" +
+                     "Upgrade: websocket\r\n" +
+                     "Connection: Upgrade\r\n" +
+                     "Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n";
+    
+    write(channel, response);
+    clientInfo.setWebSocket(true);
+}
+```
+
+#### Slide 8: Challenges & Solutions
+| Challenge | Solution |
+|-----------|----------|
+| Concurrent client handling | Java NIO Selector pattern |
+| Protocol compatibility | Dual protocol support (WS + TCP) |
+| Thread safety | ConcurrentHashMap, synchronized blocks |
+| Question timing | ScheduledExecutorService |
+| WebSocket framing | Custom RFC 6455 implementation |
+
+#### Slide 9: Future Enhancements
+- 🔐 User authentication & profiles
+- 💾 Database integration (PostgreSQL/MongoDB)
+- 📊 Statistics and analytics
+- 🏆 Achievement system
+- 🎨 Theme customization
+- 📱 Mobile app (Android/iOS)
+- 🔊 Audio/video questions
+- 🌍 Internationalization
+
+#### Slide 10: Conclusion & Q&A
+- **Summary:**
+  - Demonstrated Java NIO and WebSocket implementation
+  - Built a fully functional real-time multiplayer system
+  - Applied concurrent programming best practices
+- **Learning Outcomes:**
+  - Network protocol design
+  - Non-blocking I/O patterns
+  - WebSocket implementation
+  - Real-time system architecture
+- **Q&A**
+
+---
+
+## 📝 Technical Deep Dive
+
+### Server Architecture
+
+#### NIO Selector Pattern
+```java
+Selector selector = Selector.open();
+ServerSocketChannel serverChannel = ServerSocketChannel.open();
+serverChannel.configureBlocking(false);
+serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+while (running) {
+    selector.select();
+    Set<SelectionKey> keys = selector.selectedKeys();
+    
+    for (SelectionKey key : keys) {
+        if (key.isAcceptable()) handleAccept(key);
+        if (key.isReadable()) handleRead(key);
+    }
+}
+```
+
+**Benefits:**
+- Single thread handles thousands of connections
+- Low memory footprint
+- Efficient CPU utilization
+- Scalable architecture
+
+#### WebSocket Implementation
+
+**Handshake Process:**
+1. Client sends HTTP Upgrade request
+2. Server extracts `Sec-WebSocket-Key`
+3. Concatenate key with magic GUID: `258EAFA5-E914-47DA-95CA-C5AB0DC85B11`
+4. SHA-1 hash and Base64 encode
+5. Send `101 Switching Protocols` response
+6. Switch to WebSocket frame mode
+
+**Frame Format:**
+```
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-------+-+-------------+-------------------------------+
+|F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+|I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+| |1|2|3|       |K|             |                               |
++-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+|     Extended payload length continued, if payload len == 127  |
++ - - - - - - - - - - - - - - - +-------------------------------+
+|                               |Masking-key, if MASK set to 1  |
++-------------------------------+-------------------------------+
+| Masking-key (continued)       |          Payload Data         |
++-------------------------------- - - - - - - - - - - - - - - - +
+:                     Payload Data continued ...                :
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                     Payload Data continued ...                |
++---------------------------------------------------------------+
+```
+
+### Question Management
+
+**Question Loading:**
+```java
+// Format: question|opt1|opt2|opt3|opt4|correctIndex|category|difficulty
+private void loadQuestions() {
+    try (BufferedReader reader = new BufferedReader(
+            new FileReader("questions.txt"))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split("\\|");
+            if (parts.length >= 8) {
+                Question q = new Question(
+                    parts[0],  // text
+                    Arrays.copyOfRange(parts, 1, 5),  // options
+                    Integer.parseInt(parts[5]),  // correct index
+                    parts[6],  // category
+                    parts[7]   // difficulty
+                );
+                allQuestions.add(q);
+            }
+        }
+    }
+}
+```
+
+**Question Selection Algorithm:**
+1. Filter by category and difficulty
+2. Shuffle remaining questions
+3. Select requested number (or available count if fewer)
+4. Schedule broadcast with timer
+
+### Thread Safety
+
+**Concurrent Collections:**
+```java
+private final ConcurrentHashMap<SocketChannel, ClientInfo> clients = 
+    new ConcurrentHashMap<>();
+private final ConcurrentHashMap<String, Integer> scores = 
+    new ConcurrentHashMap<>();
+```
+
+**Synchronized Access:**
+```java
+private synchronized void broadcast(String message) {
+    for (SocketChannel client : clients.keySet()) {
+        write(client, message);
+    }
+}
+```
+
+### Scoring System
+
+**Score Calculation:**
+- Base points: 100 per correct answer
+- Time bonus: Up to 50 points based on response speed
+- Formula: `score = 100 + (50 * remainingTime / totalTime)`
+
+**Leaderboard Updates:**
+- Real-time score updates after each question
+- Sorted by score descending
+- Broadcast to all clients simultaneously
+
+---
+
+## 🐛 Troubleshooting
+
+### Server Won't Start
+```
+Error: Address already in use
+```
+**Solution:** Kill process using port 9000
+```powershell
+netstat -ano | findstr :9000
+taskkill /PID <process_id> /F
+```
+
+### WebSocket Connection Failed
+```
+WebSocket connection to 'ws://localhost:9000/' failed
+```
+**Solution:**
+1. Ensure server is running
+2. Check firewall settings
+3. Verify browser WebSocket support
+4. Check server console for handshake errors
+
+### Questions Not Loading
+```
+No questions available
+```
+**Solution:**
+1. Verify `questions.txt` exists in project root
+2. Check file format (pipe-delimited)
+3. Ensure at least one question matches category/difficulty
+
+### Client Can't Connect
+**Solution:**
+1. Verify server is running: `netstat -an | findstr 9000`
+2. Check network connectivity
+3. Verify correct IP address and port
+4. Check firewall/antivirus settings
+
+---
+
+## 📚 Resources & References
+
+### Java Documentation
+- [Java NIO Tutorial](https://docs.oracle.com/javase/tutorial/essential/io/nio.html)
+- [Selector API](https://docs.oracle.com/javase/8/docs/api/java/nio/channels/Selector.html)
+- [SocketChannel API](https://docs.oracle.com/javase/8/docs/api/java/nio/channels/SocketChannel.html)
+
+### WebSocket
+- [RFC 6455 - WebSocket Protocol](https://tools.ietf.org/html/rfc6455)
+- [MDN WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
+
+### Concurrency
+- [Java Concurrency in Practice](https://jcip.net/)
+- [ConcurrentHashMap Guide](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+### Development Setup
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes
+4. Test thoroughly
+5. Commit: `git commit -am 'Add new feature'`
+6. Push: `git push origin feature/your-feature`
+7. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 👥 Authors
+
+**QuizNet Development Team**
+- Network Protocol Design
+- Server Implementation (Java NIO + WebSocket)
+- Web Client Development
+- UI/UX Design
+
+---
+
+## 🙏 Acknowledgments
+
+- Java NIO framework and documentation
+- WebSocket RFC 6455 specification
+- University of Moratuwa - Computer Science and Engineering
+- All contributors and testers
+
+---
+
+## 📞 Support
+
+For questions, issues, or feedback:
+- Open an issue on GitHub
+- Contact the development team
+- Check the troubleshooting section above
+
+---
+
+**Happy Quizzing! 🎉**
+
