@@ -296,7 +296,7 @@ For issues or questions, please create an issue in the repository.
 
 ---
 
-**Built with ❤️ using Java NIO and WebSockets**
+**Built with using Java NIO and WebSockets**
 - To answer type: `answer Q0 2` (example) to send answer for question Q0 option 2.
 - To chat: `chat Hello everyone`
 - To quit: type `quit`
