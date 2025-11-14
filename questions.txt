@@ -1,48 +1,48 @@
 # QuizNet Questions
 # Format: question|option1|option2|option3|option4|correctIndex|category|difficulty
 # Categories: general, science, history, geography, technology, sports
-# Difficulty: easy, medium, hard
+
 
 # Geography Questions
-What is the capital of France?|Paris|London|Rome|Berlin|1|geography|easy
-What is the largest ocean on Earth?|Atlantic|Indian|Arctic|Pacific|4|geography|easy
-Which country has the most natural lakes?|USA|Russia|Canada|Brazil|3|geography|medium
-What is the smallest country in the world?|Monaco|Vatican City|San Marino|Liechtenstein|2|geography|easy
+What is the capital of France?|Paris|London|Rome|Berlin|1|geography
+What is the largest ocean on Earth?|Atlantic|Indian|Arctic|Pacific|4|geography
+Which country has the most natural lakes?|USA|Russia|Canada|Brazil|3|geography
+What is the smallest country in the world?|Monaco|Vatican City|San Marino|Liechtenstein|2|geography
 
 # Science Questions
-Which planet is known as the Red Planet?|Earth|Mars|Jupiter|Venus|2|science|easy
-What is the chemical symbol for gold?|Go|Gd|Au|Ag|3|science|medium
-What is the speed of light?|299,792 km/s|150,000 km/s|400,000 km/s|200,000 km/s|1|science|hard
-How many bones are in the human body?|186|206|226|196|2|science|medium
+Which planet is known as the Red Planet?|Earth|Mars|Jupiter|Venus|2|science
+What is the chemical symbol for gold?|Go|Gd|Au|Ag|3|science
+What is the speed of light?|299,792 km/s|150,000 km/s|400,000 km/s|200,000 km/s|1|science
+How many bones are in the human body?|186|206|226|196|2|science
 
 # Literature & Arts
-Who wrote 'Romeo and Juliet'?|Charles Dickens|William Shakespeare|Mark Twain|Jane Austen|2|literature|easy
-Who painted the Mona Lisa?|Vincent van Gogh|Pablo Picasso|Leonardo da Vinci|Michelangelo|3|literature|medium
+Who wrote 'Romeo and Juliet'?|Charles Dickens|William Shakespeare|Mark Twain|Jane Austen|2|literature
+Who painted the Mona Lisa?|Vincent van Gogh|Pablo Picasso|Leonardo da Vinci|Michelangelo|3|literature
 
 # Technology
-Which language runs on the JVM?|Python|C#|Java|JavaScript|3|technology|easy
-What does HTML stand for?|Hyper Text Markup Language|High Tech Modern Language|Home Tool Markup Language|Hyperlinks Text Mark Language|1|technology|easy
-Who is the founder of Microsoft?|Steve Jobs|Bill Gates|Mark Zuckerberg|Elon Musk|2|technology|easy
-What year was the first iPhone released?|2005|2006|2007|2008|3|technology|medium
+Which language runs on the JVM?|Python|C#|Java|JavaScript|3|technology
+What does HTML stand for?|Hyper Text Markup Language|High Tech Modern Language|Home Tool Markup Language|Hyperlinks Text Mark Language|1|technology
+Who is the founder of Microsoft?|Steve Jobs|Bill Gates|Mark Zuckerberg|Elon Musk|2|technology
+What year was the first iPhone released?|2005|2006|2007|2008|3|technology
 
 # Mathematics
-What is 2+2?|3|4|5|6|2|mathematics|easy
-What is the square root of 144?|10|11|12|13|3|mathematics|easy
-What is 15% of 200?|20|25|30|35|3|mathematics|medium
-What is the value of Pi to 2 decimal places?|3.12|3.14|3.16|3.18|2|mathematics|easy
+What is 2+2?|3|4|5|6|2|mathematics
+What is the square root of 144?|10|11|12|13|3|mathematics
+What is 15% of 200?|20|25|30|35|3|mathematics
+What is the value of Pi to 2 decimal places?|3.12|3.14|3.16|3.18|2|mathematics
 
 # History
-In which year did World War II end?|1943|1944|1945|1946|3|history|medium
-Who was the first President of the United States?|Thomas Jefferson|George Washington|John Adams|Benjamin Franklin|2|history|easy
-When did the Berlin Wall fall?|1987|1988|1989|1990|3|history|medium
+In which year did World War II end?|1943|1944|1945|1946|3|history
+Who was the first President of the United States?|Thomas Jefferson|George Washington|John Adams|Benjamin Franklin|2|history
+When did the Berlin Wall fall?|1987|1988|1989|1990|3|history
 
 # Sports
-How many players are on a soccer team?|9|10|11|12|3|sports|easy
-Which country won the FIFA World Cup in 2018?|Germany|Brazil|France|Argentina|3|sports|medium
-How many rings are on the Olympic flag?|4|5|6|7|2|sports|easy
+How many players are on a soccer team?|9|10|11|12|3|sports
+Which country won the FIFA World Cup in 2018?|Germany|Brazil|France|Argentina|3|sports
+How many rings are on the Olympic flag?|4|5|6|7|2|sports
 
 # General Knowledge
-What is the largest mammal in the world?|African Elephant|Blue Whale|Giraffe|Polar Bear|2|general|easy
-How many continents are there?|5|6|7|8|3|general|easy
-What is the currency of Japan?|Yuan|Won|Yen|Ringgit|3|general|medium
+What is the largest mammal in the world?|African Elephant|Blue Whale|Giraffe|Polar Bear|2|general
+How many continents are there?|5|6|7|8|3|general
+What is the currency of Japan?|Yuan|Won|Yen|Ringgit|3|general
 
